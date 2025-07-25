@@ -93,6 +93,13 @@ namespace PortaCapena.OdooJsonRpcClient.Converters
                     result = value.First.ToObject(dotnetType);
                     return true;
 
+                // JSON fields have been introduced in v17 (no official doc)
+                // HelpdeskTicket/ProjectTask.duration_tracking is a known json type => string
+                // AccountMove/SaleOrder.tax_totals is a known binary type (file), it looks like it contains json text => string
+                case JTokenType.Object /*A JSON field*/ when dotnetType == typeof(string):
+                    result = value.ToString();
+                    return true;
+
                 default:
                     throw new Exception($"Not implemented json mapping value: '${value.Parent}' to {dotnetType.Name}");
             }
