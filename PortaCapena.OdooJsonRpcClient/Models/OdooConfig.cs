@@ -10,6 +10,7 @@ namespace PortaCapena.OdooJsonRpcClient.Models
         public string UserName { get; }
         public string Password { get; }
         public TimeSpan Timeout { get; }
+        public string[] AcceptEncoding { get; set; }
 
         public OdooContext Context { get; }
 

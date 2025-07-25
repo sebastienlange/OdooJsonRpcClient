@@ -57,7 +57,11 @@ namespace PortaCapena.OdooJsonRpcClient
             var handler = new HttpClientHandler
             {
                 AllowAutoRedirect = false,
-                ClientCertificateOptions = ClientCertificateOption.Manual
+                ClientCertificateOptions = ClientCertificateOption.Manual,
+                AutomaticDecompression =
+                    //System.Net.DecompressionMethods.Brotli | // Not supported by Odoo, anyway requires library to be compiled in .NET 6+
+                    System.Net.DecompressionMethods.GZip |
+                    System.Net.DecompressionMethods.Deflate
             };
 
             handler.ServerCertificateCustomValidationCallback = ServerCertificateValidation;
@@ -94,6 +98,11 @@ namespace PortaCapena.OdooJsonRpcClient
             Config = config;
             if (config.Timeout != default(TimeSpan))
                 _client.Timeout = config.Timeout;
+
+            if (config.AcceptEncoding != null)
+                foreach (var encoding in config.AcceptEncoding)
+                    if (!_client.DefaultRequestHeaders.AcceptEncoding.Contains(new StringWithQualityHeaderValue(encoding.ToLower())))
+                        _client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(encoding.ToLower()));
         }
 
         #region Get
